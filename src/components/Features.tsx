@@ -2,8 +2,13 @@ import { Box, Typography } from '@mui/material';
 
 export default function Features() {
   return (
-    <Box id="features" sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
+    <Box 
+      id="features" 
+      component="section" 
+      sx={{ p: 3 }}
+      aria-labelledby="features-title"
+    >
+      <Typography id="features-title" variant="h4" gutterBottom>
         Features
       </Typography>
 

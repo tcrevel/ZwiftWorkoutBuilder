@@ -7,7 +7,7 @@ export default function ChangeLog() {
         Change Log
       </Typography>
 
-      <Typography variant="h6">Version 1.1.0 (2024-12-06)</Typography>
+      <Typography variant="h6">Version 1.1.0 (2024-03-20)</Typography>
       <ul>
         <li>Added advanced metrics calculation (TSS, NP, IF)</li>
         <li>Implemented power zone analysis and visualization</li>
@@ -18,7 +18,7 @@ export default function ChangeLog() {
         <li>Improved mobile responsiveness</li>
       </ul>
 
-      <Typography variant="h6">Version 1.0.0 (2024-12-05)</Typography>
+      <Typography variant="h6">Version 1.0.0 (2024-03-15)</Typography>
       <ul>
         <li>Initial release</li>
         <li>Basic workout builder with visual graph preview</li>
