@@ -1,3 +1,8 @@
+/**
+ * WorkoutForm Component
+ * Part of Zwift Workout Builder
+ * @see https://github.com/tcrevel/ZwiftWorkoutBuilder
+ */
 import React, { useState, useEffect } from 'react';
 import {
   Paper,
@@ -395,20 +400,14 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({
           <ButtonGroup size="small">
             <Tooltip title="Undo (Ctrl+Z)">
               <span>
-                <Button
-                  onClick={onUndo}
-                  disabled={!canUndo}
-                >
+                <Button onClick={onUndo} disabled={!canUndo}>
                   <UndoIcon />
                 </Button>
               </span>
             </Tooltip>
             <Tooltip title="Redo (Ctrl+Y)">
               <span>
-                <Button
-                  onClick={onRedo}
-                  disabled={!canRedo}
-                >
+                <Button onClick={onRedo} disabled={!canRedo}>
                   <RedoIcon />
                 </Button>
               </span>

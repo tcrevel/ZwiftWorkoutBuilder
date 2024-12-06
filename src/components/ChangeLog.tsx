@@ -1,4 +1,5 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
+import GitHubIcon from '@mui/icons-material/GitHub';
 
 export default function ChangeLog() {
   return (
@@ -26,6 +27,32 @@ export default function ChangeLog() {
         <li>Import/Export .zwo file functionality</li>
         <li>Basic workout management features</li>
       </ul>
+
+      <Box sx={{ 
+        mt: 4, 
+        pt: 2, 
+        borderTop: 1, 
+        borderColor: 'divider',
+        textAlign: 'center'
+      }}>
+        <Button
+          variant="outlined"
+          startIcon={<GitHubIcon />}
+          href="https://github.com/tcrevel/ZwiftWorkoutBuilder"
+          target="_blank"
+          rel="noopener noreferrer"
+          sx={{ 
+            textTransform: 'none',
+            px: 3,
+            py: 1
+          }}
+        >
+          View on GitHub
+        </Button>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          Contribute to the project and help make it better!
+        </Typography>
+      </Box>
     </Box>
   );
 } 
