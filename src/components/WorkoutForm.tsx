@@ -59,6 +59,26 @@ const ZoneButton = styled(Button)<ZoneButtonProps>(({ theme, bgColor }) => ({
   margin: theme.spacing(0.5),
 }));
 
+const PresetButton = styled(Button)(({ theme }) => ({
+  minWidth: '42px',
+  height: '28px',
+  padding: theme.spacing(0.5, 1),
+  margin: theme.spacing(0.5),
+  borderRadius: '14px',
+  fontSize: '0.8125rem',
+  fontWeight: 500,
+  textTransform: 'none',
+  border: `1px solid ${theme.palette.divider}`,
+  '&:hover': {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    borderColor: theme.palette.primary.main,
+  },
+}));
+
+const DURATION_PRESETS = [1, 2, 3, 5, 10, 15, 20, 30];
+const SECONDS_PRESETS = [0, 10, 15, 30];
+
 const WorkoutForm: React.FC<WorkoutFormProps> = ({ 
   onAddSegment, 
   onExport,
@@ -469,12 +489,102 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({
 
           {/* Duration for non-interval segments */}
           {segmentType !== 'interval' && (
-            <DurationInput
-              minutesValue={minutes}
-              setMinutes={setMinutes}
-              secondsValue={seconds}
-              setSeconds={setSeconds}
-            />
+            <>
+              <DurationInput
+                minutesValue={minutes}
+                setMinutes={setMinutes}
+                secondsValue={seconds}
+                setSeconds={setSeconds}
+              />
+              
+              {/* Duration presets */}
+              <Box sx={{ mb: 2 }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  gap: 3,
+                  justifyContent: 'space-between'
+                }}>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography 
+                      variant="body2" 
+                      color="textSecondary" 
+                      sx={{ 
+                        mb: 1,
+                        fontWeight: 500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
+                      }}
+                    >
+                      Minutes
+                    </Typography>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      flexWrap: 'wrap', 
+                      gap: 0.5,
+                      justifyContent: 'flex-start',
+                    }}>
+                      {DURATION_PRESETS.map((preset) => (
+                        <PresetButton
+                          key={`min-${preset}`}
+                          variant="outlined"
+                          size="small"
+                          onClick={() => setMinutes(preset.toString())}
+                          sx={{
+                            backgroundColor: minutes === preset.toString() ? 'primary.main' : 'transparent',
+                            color: minutes === preset.toString() ? 'primary.contrastText' : 'inherit',
+                            '&:hover': {
+                              backgroundColor: minutes === preset.toString() ? 'primary.dark' : 'primary.main',
+                            }
+                          }}
+                        >
+                          {preset}m
+                        </PresetButton>
+                      ))}
+                    </Box>
+                  </Box>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography 
+                      variant="body2" 
+                      color="textSecondary" 
+                      sx={{ 
+                        mb: 1,
+                        fontWeight: 500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
+                      }}
+                    >
+                      Seconds
+                    </Typography>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      flexWrap: 'wrap', 
+                      gap: 0.5,
+                      justifyContent: 'flex-start',
+                    }}>
+                      {SECONDS_PRESETS.map((preset) => (
+                        <PresetButton
+                          key={`sec-${preset}`}
+                          variant="outlined"
+                          size="small"
+                          onClick={() => setSeconds(preset.toString())}
+                          sx={{
+                            backgroundColor: seconds === preset.toString() ? 'primary.main' : 'transparent',
+                            color: seconds === preset.toString() ? 'primary.contrastText' : 'inherit',
+                            '&:hover': {
+                              backgroundColor: seconds === preset.toString() ? 'primary.dark' : 'primary.main',
+                            }
+                          }}
+                        >
+                          {preset}s
+                        </PresetButton>
+                      ))}
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+            </>
           )}
 
           {/* Power settings for steady segments */}
