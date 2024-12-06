@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Paper, Typography, TextField, Grid, Button, Snackbar, Alert } from '@mui/material';
+import { Box, Paper, Typography, TextField, Grid, Button, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import UploadIcon from '@mui/icons-material/Upload';
 import { Workout, WorkoutSegment } from '../types/workout';
 import WorkoutTimeline from './WorkoutTimeline';
@@ -21,12 +21,19 @@ interface WorkoutHistory {
 interface WorkoutBuilderProps {
   workout: Workout;
   onWorkoutChange: (workout: Workout) => void;
+  zwiftId: string;
+  onZwiftIdChange: (id: string) => void;
 }
 
-const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ workout: externalWorkout, onWorkoutChange }) => {
+const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ 
+  workout, 
+  onWorkoutChange,
+  zwiftId,
+  onZwiftIdChange,
+}) => {
   const [history, setHistory] = useState<WorkoutHistory>(() => ({
     past: [],
-    present: externalWorkout,
+    present: workout,
     future: [],
   }));
   const [editingSegment, setEditingSegment] = useState<{ index: number; segment: WorkoutSegment } | null>(null);
@@ -41,6 +48,15 @@ const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ workout: externalWorkou
     severity: 'success'
   });
   const autoSaveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const [instructionsDialog, setInstructionsDialog] = useState<{
+    open: boolean;
+    path: string;
+    fileName: string;
+  }>({
+    open: false,
+    path: '',
+    fileName: ''
+  });
 
   // Save entire history state to local storage whenever it changes
   useEffect(() => {
@@ -204,15 +220,73 @@ const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ workout: externalWorkou
   };
 
   const handleExportZwo = () => {
-    const blob = generateZwoFile(history.present);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${history.present.name || 'workout'}.zwo`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    if (!zwiftId) {
+      setNotification({
+        open: true,
+        message: 'Please enter your Zwift ID first',
+        severity: 'error'
+      });
+      return;
+    }
+
+    try {
+      const blob = generateZwoFile(history.present);
+      const fileName = `${history.present.name || 'workout'}.zwo`;
+      
+      // Get Windows username from localStorage or prompt
+      let windowsUsername = localStorage.getItem('windows_username');
+      
+      if (!windowsUsername) {
+        // Show a more user-friendly prompt
+        windowsUsername = window.prompt(
+          'Please enter your Windows username (the name of your user folder in C:\\Users\\)',
+          ''
+        );
+        
+        if (!windowsUsername) {
+          setNotification({
+            open: true,
+            message: 'Windows username is required to create the correct path',
+            severity: 'error'
+          });
+          return;
+        }
+        
+        // Save for future use
+        localStorage.setItem('windows_username', windowsUsername);
+      }
+
+      const zwiftPath = `C:\\Users\\${windowsUsername}\\Documents\\Zwift\\Workouts\\${zwiftId}`;
+
+      // Create a temporary download link
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+
+      // Show instructions
+      setNotification({
+        open: true,
+        message: `Please save the file to:\n${zwiftPath}\n\nIf the folder doesn't exist, please create it.`,
+        severity: 'success'
+      });
+
+      setInstructionsDialog({
+        open: true,
+        path: zwiftPath,
+        fileName: fileName
+      });
+    } catch (error) {
+      console.error('Failed to export workout:', error);
+      setNotification({
+        open: true,
+        message: 'Failed to export workout',
+        severity: 'error'
+      });
+    }
   };
 
   const handleUpdateField = (field: keyof Workout, value: any) => {
@@ -290,6 +364,52 @@ const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ workout: externalWorkou
       });
     }
   };
+
+  const InstructionsDialog = () => (
+    <Dialog
+      open={instructionsDialog.open}
+      onClose={() => setInstructionsDialog(prev => ({ ...prev, open: false }))}
+      maxWidth="md"
+      fullWidth
+    >
+      <DialogTitle>Save Workout File</DialogTitle>
+      <DialogContent>
+        <Typography variant="body1" paragraph>
+          To use this workout in Zwift, please follow these steps:
+        </Typography>
+        <Typography component="div">
+          <ol>
+            <li>When the file download starts, choose "Save As"</li>
+            <li>Navigate to this exact folder:
+              <Box sx={{ 
+                bgcolor: 'grey.100', 
+                p: 1, 
+                my: 1, 
+                borderRadius: 1,
+                fontFamily: 'monospace'
+              }}>
+                {instructionsDialog.path}
+              </Box>
+            </li>
+            <li>If the folder doesn't exist:
+              <ul>
+                <li>Create the "Zwift" folder in your Documents</li>
+                <li>Create a "Workouts" folder inside "Zwift"</li>
+                <li>Create a folder with your Zwift ID ({zwiftId}) inside "Workouts"</li>
+              </ul>
+            </li>
+            <li>Save the file as "{instructionsDialog.fileName}"</li>
+            <li>Start Zwift and you'll find the workout in your custom workouts</li>
+          </ol>
+        </Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setInstructionsDialog(prev => ({ ...prev, open: false }))}>
+          Got it
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
 
   return (
     <Box sx={{ 
@@ -398,6 +518,8 @@ const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ workout: externalWorkou
             onUndo={handleUndo}
             onRedo={handleRedo}
             onLoadWorkout={handleLoadWorkout}
+            zwiftId={zwiftId}
+            onZwiftIdChange={onZwiftIdChange}
           />
         </Box>
         <Box sx={{ 
@@ -446,6 +568,8 @@ const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({ workout: externalWorkou
           {notification.message}
         </Alert>
       </Snackbar>
+
+      <InstructionsDialog />
     </Box>
   );
 };

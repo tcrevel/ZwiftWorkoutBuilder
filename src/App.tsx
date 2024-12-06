@@ -28,6 +28,10 @@ function App() {
 
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  const [zwiftId, setZwiftId] = useState(() => {
+    return localStorage.getItem('zwift_player_id') || '';
+  });
+
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.pageYOffset > 300);
@@ -48,6 +52,10 @@ function App() {
     saveCurrentWorkout(workout);
   }, [workout]);
 
+  useEffect(() => {
+    localStorage.setItem('zwift_player_id', zwiftId);
+  }, [zwiftId]);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -67,7 +75,12 @@ function App() {
                 overflow: 'hidden'
               }}
             >
-              <WorkoutBuilder workout={workout} onWorkoutChange={setWorkout} />
+              <WorkoutBuilder 
+                workout={workout} 
+                onWorkoutChange={setWorkout}
+                zwiftId={zwiftId}
+                onZwiftIdChange={setZwiftId}
+              />
             </Container>
           </Box>
           <Box sx={{ bgcolor: 'grey.50', overflow: 'hidden' }}>

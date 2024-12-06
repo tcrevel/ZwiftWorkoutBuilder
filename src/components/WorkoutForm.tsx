@@ -27,6 +27,7 @@ import RedoIcon from '@mui/icons-material/Redo';
 import DownloadIcon from '@mui/icons-material/Download';
 import SaveIcon from '@mui/icons-material/Save';
 import ClearIcon from '@mui/icons-material/Clear';
+import PersonIcon from '@mui/icons-material/Person';
 import { WorkoutSegment, Workout } from '../types/workout';
 import WorkoutLibrary from './WorkoutLibrary';
 import { powerZones } from '../utils/powerZones';
@@ -43,6 +44,8 @@ interface WorkoutFormProps {
   onUndo: () => void;
   onRedo: () => void;
   onLoadWorkout: (workout: Workout) => void;
+  zwiftId: string;
+  onZwiftIdChange: (id: string) => void;
 }
 
 interface ZoneButtonProps {
@@ -95,6 +98,8 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({
   onUndo,
   onRedo,
   onLoadWorkout,
+  zwiftId,
+  onZwiftIdChange,
 }) => {
   const [segmentType, setSegmentType] = useState<WorkoutSegment['type']>('steady');
   
@@ -383,12 +388,26 @@ const WorkoutForm: React.FC<WorkoutFormProps> = ({
 
   return (
     <Box sx={{ width: '100%', overflow: 'hidden' }}>
-      <Paper sx={{ 
-        p: { xs: 0.75, sm: 2 }, 
-        mb: { xs: 1, sm: 2 },
-        width: '100%',
-        overflow: 'hidden',
-      }}>
+      <Paper sx={{ p: { xs: 0.75, sm: 2 }, mb: { xs: 1, sm: 2 }, width: '100%' }}>
+        <Box sx={{ mb: 2 }}>
+          <TextField
+            fullWidth
+            label="Zwift Player ID"
+            value={zwiftId}
+            onChange={(e) => onZwiftIdChange(e.target.value)}
+            placeholder="Enter your Zwift ID"
+            size="small"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonIcon color="action" />
+                </InputAdornment>
+              ),
+            }}
+            helperText="Your Zwift ID is needed to save workouts to your Zwift account, should be  C:\Users\<Your Account>\Documents\Zwift\Workouts\<Zwift ID>"
+          />
+        </Box>
+
         <Box sx={{ 
           display: 'flex', 
           justifyContent: 'space-between',
