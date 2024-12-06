@@ -1,44 +1,23 @@
 # Zwift Workout Builder
 
-A modern, user-friendly web application for creating and editing Zwift workouts. Build your custom workouts with an intuitive interface and export them directly to Zwift's .zwo format.
-
-Try it now: [Zwift Workout Builder](https://tcrevel.github.io/ZwiftWorkoutBuilder/)
-
-![Zwift Workout Builder](screenshot.png)
+A web-based tool for creating and managing Zwift workouts.
 
 ## Features
 
-- 📊 Visual workout builder with power graph preview
-- 🎯 Support for all workout segment types:
+- Visual workout builder with real-time power graph preview
+- Support for all workout segment types:
   - Steady state
   - Intervals
   - Warmup
   - Cooldown
-- ⚡ Advanced metrics:
-  - Training Stress Score (TSS)
-  - Normalized Power (NP)
-  - Intensity Factor (IF)
-  - Work in kilojoules (kJ)
-- 🔄 Power zone analysis:
-  - Time in zones breakdown
-  - Zone distribution visualization
-  - Power zone targeting
-- 💪 Workout classification:
-  - Workout type detection
-  - Energy system focus
-  - Recovery recommendations
-- 🍪 Nutrition guidance:
-  - CHO2 estimation
-  - Hourly carb requirements
-- 💾 Workout management:
-  - Import existing .zwo files
-  - Export to Zwift-compatible format
-  - Save workouts to library
-- 🎮 User experience:
-  - Drag and drop segment reordering
-  - Precise duration control
-  - Undo/Redo functionality (Ctrl+Z, Ctrl+Y)
-  - Responsive design for all devices
+- Import and export Zwift-compatible .zwo files
+- Drag and drop segment reordering
+- Undo/Redo functionality with keyboard shortcuts (Ctrl+Z, Ctrl+Y)
+- Duration presets for quick workout creation
+- Power zone targeting
+- Workout library for saving and loading workouts
+- Automatic workout saving
+- Responsive design for all devices
 
 ## Getting Started
 
@@ -46,6 +25,7 @@ Try it now: [Zwift Workout Builder](https://tcrevel.github.io/ZwiftWorkoutBuilde
 
 - Node.js (v18 or higher)
 - npm or yarn
+- A Zwift account and installation
 
 ### Installation
 

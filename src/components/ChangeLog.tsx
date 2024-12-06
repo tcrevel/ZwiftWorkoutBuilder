@@ -8,6 +8,15 @@ export default function ChangeLog() {
         Change Log
       </Typography>
 
+      <Typography variant="h6">Version 1.2.0 (2024-03-22)</Typography>
+      <ul>
+        <li>Added duration presets for quick segment creation</li>
+        <li>Improved export workflow with clear save location instructions</li>
+        <li>Added Zwift ID field for easier workout export</li>
+        <li>Enhanced user interface for power zone selection</li>
+        <li>Improved mobile responsiveness</li>
+      </ul>
+
       <Typography variant="h6">Version 1.1.0 (2024-03-20)</Typography>
       <ul>
         <li>Added advanced metrics calculation (TSS, NP, IF)</li>
