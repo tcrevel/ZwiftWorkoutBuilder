@@ -12,14 +12,31 @@ A modern, user-friendly web application for creating and editing Zwift workouts.
   - Intervals
   - Warmup
   - Cooldown
-- ⚡ Power settings from 50% to 170% FTP
-- 🔄 Import existing .zwo files
-- 💾 Export workouts to Zwift-compatible .zwo format
-- 🎮 Drag and drop segment reordering
-- ⏱️ Precise duration control with minutes and seconds
-- 🔄 Undo/Redo functionality
-- 💻 Responsive design for desktop, tablet, and mobile
-- 🚴‍♂️ Optional cadence targets for each segment
+- ⚡ Advanced metrics:
+  - Training Stress Score (TSS)
+  - Normalized Power (NP)
+  - Intensity Factor (IF)
+  - Work in kilojoules (kJ)
+- 🔄 Power zone analysis:
+  - Time in zones breakdown
+  - Zone distribution visualization
+  - Power zone targeting
+- 💪 Workout classification:
+  - Workout type detection
+  - Energy system focus
+  - Recovery recommendations
+- 🍪 Nutrition guidance:
+  - CHO2 estimation
+  - Hourly carb requirements
+- 💾 Workout management:
+  - Import existing .zwo files
+  - Export to Zwift-compatible format
+  - Save workouts to library
+- 🎮 User experience:
+  - Drag and drop segment reordering
+  - Precise duration control
+  - Undo/Redo functionality (Ctrl+Z, Ctrl+Y)
+  - Responsive design for all devices
 
 ## Getting Started
 
