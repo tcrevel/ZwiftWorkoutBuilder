@@ -2,6 +2,8 @@
 
 A modern, user-friendly web application for creating and editing Zwift workouts. Build your custom workouts with an intuitive interface and export them directly to Zwift's .zwo format.
 
+Try it now: [Zwift Workout Builder](https://tcrevel.github.io/ZwiftWorkoutBuilder/)
+
 ![Zwift Workout Builder](screenshot.png)
 
 ## Features
@@ -50,8 +52,8 @@ A modern, user-friendly web application for creating and editing Zwift workouts.
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/zwift-workout-builder.git
-cd zwift-workout-builder
+git clone https://github.com/tcrevel/ZwiftWorkoutBuilder.git
+cd ZwiftWorkoutBuilder
 ```
 
 2. Install dependencies:
@@ -106,7 +108,7 @@ yarn dev
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request to the [GitHub repository](https://github.com/tcrevel/ZwiftWorkoutBuilder).
 
 ## License
 
@@ -115,8 +117,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 - Thanks to Zwift for inspiring this project
-- Built with ❤️ by Thibault Crevel
+- Built with ❤️ by [Thibault Crevel](https://github.com/tcrevel)
 
 ## Support
 
-If you encounter any issues or have questions, please [open an issue](https://github.com/yourusername/zwift-workout-builder/issues).
+If you encounter any issues or have questions, please [open an issue](https://github.com/tcrevel/ZwiftWorkoutBuilder/issues).
+
+## Repository
+
+- GitHub: [https://github.com/tcrevel/ZwiftWorkoutBuilder](https://github.com/tcrevel/ZwiftWorkoutBuilder)
