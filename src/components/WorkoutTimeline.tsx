@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Paper, Typography, List, ListItem, ListItemText, IconButton, Box, TextField, Tooltip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import {
   ComposedChart,
   ReferenceArea,
@@ -21,6 +23,8 @@ import BoltIcon from '@mui/icons-material/Bolt';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import CategoryIcon from '@mui/icons-material/Category';
 import HotelIcon from '@mui/icons-material/Hotel';
+import NutritionGuidance from './NutritionGuidance';
+import { calculateNutrition } from '../utils/nutritionCalculator';
 
 interface WorkoutTimelineProps {
   workout: Workout;
@@ -232,91 +236,17 @@ export default function WorkoutTimeline({
   const calculateTSS = () => {
     if (workout.segments.length === 0) return 0;
 
-    let totalStress = 0;
-    let totalSeconds = 0;
-
-    workout.segments.forEach((segment) => {
-      const duration = segment.duration;
-      let intensity;
-
-      if (segment.type === 'interval') {
-        // For intervals, calculate weighted average intensity
-        const onTime = segment.onDuration * segment.repetitions;
-        const offTime = segment.offDuration * segment.repetitions;
-        const totalTime = onTime + offTime;
-        intensity = (onTime * Math.pow(segment.powerTarget1Percent / 100, 2) + 
-                    offTime * Math.pow(segment.powerTarget2Percent / 100, 2)) / totalTime;
-      } else if (segment.type === 'steady') {
-        intensity = Math.pow(segment.powerPercent / 100, 2);
-      } else {
-        // For ramps (warmup/cooldown), use average power
-        const avgPower = (segment.startPowerPercent + segment.endPowerPercent) / 2;
-        intensity = Math.pow(avgPower / 100, 2);
-      }
-
-      totalStress += duration * intensity;
-      totalSeconds += duration;
-    });
-
-    // TSS = (seconds × normalized power × intensity factor) ÷ (FTP × 3600) × 100
-    const hourlyFactor = totalSeconds / 3600;
-    const tss = (totalStress / totalSeconds) * hourlyFactor * 100;
+    // Calculate normalized power first
+    const np = calculateNP();
+    const intensityFactor = np / ftp;
+    const totalSeconds = getTotalDuration();
+    const hours = totalSeconds / 3600;
+    
+    // TSS = (hours * IF^2 * 100)
+    // Where IF = NP/FTP
+    const tss = hours * Math.pow(intensityFactor, 2) * 100;
     
     return Math.round(tss);
-  };
-
-  const calculateCHO2 = () => {
-    if (workout.segments.length === 0) return { total: 0, hourlyRate: 0 };
-
-    let totalCHO2 = 0;
-    let weightedTimeIntensity = 0;
-    let totalDurationHours = 0;
-    
-    workout.segments.forEach((segment) => {
-      const durationHours = segment.duration / 3600;
-      totalDurationHours += durationHours;
-      let intensity;
-
-      if (segment.type === 'interval') {
-        // For intervals, use weighted average intensity
-        const onTime = segment.onDuration * segment.repetitions;
-        const offTime = segment.offDuration * segment.repetitions;
-        const totalTime = onTime + offTime;
-        intensity = (onTime * segment.powerTarget1Percent + offTime * segment.powerTarget2Percent) / totalTime;
-      } else if (segment.type === 'steady') {
-        intensity = segment.powerPercent;
-      } else {
-        // For ramps (warmup/cooldown), use average power
-        intensity = (segment.startPowerPercent + segment.endPowerPercent) / 2;
-      }
-
-      weightedTimeIntensity += intensity * durationHours;
-
-      // CHO2 calculation based on intensity
-      // Below 50% FTP: ~30g/hour
-      // 50-75% FTP: ~45g/hour
-      // 75-85% FTP: ~60g/hour
-      // Above 85% FTP: ~90g/hour
-      let cho2Rate;
-      if (intensity < 50) cho2Rate = 30;
-      else if (intensity < 75) cho2Rate = 45;
-      else if (intensity < 85) cho2Rate = 60;
-      else cho2Rate = 90;
-
-      totalCHO2 += cho2Rate * durationHours;
-    });
-
-    const averageIntensity = weightedTimeIntensity / totalDurationHours;
-    let averageHourlyRate;
-    if (averageIntensity < 50) averageHourlyRate = 30;
-    else if (averageIntensity < 75) averageHourlyRate = 45;
-    else if (averageIntensity < 85) averageHourlyRate = 60;
-    else averageHourlyRate = 90;
-
-    return {
-      total: Math.round(totalCHO2),
-      hourlyRate: averageHourlyRate
-    };
   };
 
   const calculateNP = () => {
@@ -363,22 +293,24 @@ export default function WorkoutTimeline({
     
     let totalWork = 0;
     workout.segments.forEach(segment => {
-      const durationHours = segment.duration / 3600;
-      let avgPower;
+      let avgPowerPercent;
       
       if (segment.type === 'interval') {
         const onTime = segment.onDuration * segment.repetitions;
         const offTime = segment.offDuration * segment.repetitions;
         const totalTime = onTime + offTime;
-        avgPower = (onTime * segment.powerTarget1Percent + offTime * segment.powerTarget2Percent) / totalTime;
+        avgPowerPercent = (onTime * segment.powerTarget1Percent + offTime * segment.powerTarget2Percent) / totalTime;
       } else if (segment.type === 'steady') {
-        avgPower = segment.powerPercent;
+        avgPowerPercent = segment.powerPercent;
       } else {
-        avgPower = (segment.startPowerPercent + segment.endPowerPercent) / 2;
+        avgPowerPercent = (segment.startPowerPercent + segment.endPowerPercent) / 2;
       }
       
-      // Work (kJ) = Power (W) * Time (hours) * 3.6
-      totalWork += (avgPower / 100) * durationHours * 3.6;
+      // Convert power percentage to actual watts
+      const avgPowerWatts = (avgPowerPercent / 100) * ftp;
+      
+      // Work (kJ) = Power (W) × Time (s) ÷ 1000
+      totalWork += (avgPowerWatts * segment.duration) / 1000;
     });
     
     return Math.round(totalWork);
@@ -493,6 +425,12 @@ export default function WorkoutTimeline({
   const maxPower = workout.segments.length > 0 ? getMaxPower() : 200;
   const totalDurationMinutes = getTotalDuration() / 60;
 
+  const [segmentsExpanded, setSegmentsExpanded] = useState(false);
+
+  const toggleSegments = () => {
+    setSegmentsExpanded(!segmentsExpanded);
+  };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <Paper sx={{ p: 2 }}>
@@ -566,7 +504,8 @@ export default function WorkoutTimeline({
                 </Typography>
                 <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <RestaurantIcon fontSize="small" />
-                  <Box component="span" sx={{ fontWeight: 'bold' }}>CHO2:</Box> {calculateCHO2().total}g ({calculateCHO2().hourlyRate}g/hr)
+                  <Box component="span" sx={{ fontWeight: 'bold' }}>CHO2:</Box> 
+                  {calculateNutrition(workout.segments).carbs}g ({calculateNutrition(workout.segments).carbsPerHour}g/hr)
                 </Typography>
                 <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <HotelIcon fontSize="small" />
@@ -688,90 +627,110 @@ export default function WorkoutTimeline({
 
       {workout.segments.length > 0 && (
         <Paper sx={{ p: 2 }}>
-          <Typography variant="subtitle1" gutterBottom>
-            Segments
-          </Typography>
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="droppable">
-              {(provided) => (
-                <List
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  sx={{ py: 0 }}
-                >
-                  {workout.segments.map((segment, index) => (
-                    <Draggable
-                      key={`segment-${index}`}
-                      draggableId={`segment-${index}`}
-                      index={index}
-                    >
-                      {(provided, snapshot) => (
-                        <ListItem
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          sx={{
-                            pl: 1,
-                            pr: 12,
-                            bgcolor: snapshot.isDragging ? 'action.hover' : 'inherit',
-                            '&:hover': {
-                              bgcolor: 'action.hover',
-                            },
-                            position: 'relative',
-                            borderBottom: index < workout.segments.length - 1 ? '1px solid rgba(0, 0, 0, 0.12)' : 'none',
-                          }}
-                        >
-                          <div
-                            {...provided.dragHandleProps}
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              marginRight: 8,
-                              cursor: 'grab',
-                            }}
-                          >
-                            <DragHandleIcon fontSize="small" color="action" />
-                          </div>
-                          <ListItemText
-                            primary={getSegmentDescription(segment, index)}
-                          />
-                          <Box
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              cursor: 'pointer',
+              '&:hover': {
+                bgcolor: 'action.hover',
+              },
+              borderRadius: 1,
+              p: 1
+            }}
+            onClick={toggleSegments}
+          >
+            <Typography variant="subtitle1">
+              Segments ({workout.segments.length})
+            </Typography>
+            {segmentsExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </Box>
+
+          {segmentsExpanded && (
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="droppable">
+                {(provided) => (
+                  <List
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    sx={{ py: 0, mt: 1 }}
+                  >
+                    {workout.segments.map((segment, index) => (
+                      <Draggable
+                        key={`segment-${index}`}
+                        draggableId={`segment-${index}`}
+                        index={index}
+                      >
+                        {(provided, snapshot) => (
+                          <ListItem
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
                             sx={{
-                              position: 'absolute',
-                              right: 8,
-                              top: '50%',
-                              transform: 'translateY(-50%)',
-                              display: 'flex',
-                              gap: 1,
+                              pl: 1,
+                              pr: 12,
+                              bgcolor: snapshot.isDragging ? 'action.hover' : 'inherit',
+                              '&:hover': {
+                                bgcolor: 'action.hover',
+                              },
+                              position: 'relative',
+                              borderBottom: index < workout.segments.length - 1 ? '1px solid rgba(0, 0, 0, 0.12)' : 'none',
                             }}
                           >
-                            <IconButton
-                              edge="end"
-                              aria-label="edit"
-                              onClick={() => onEditSegment(index)}
-                              size="small"
+                            <div
+                              {...provided.dragHandleProps}
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                marginRight: 8,
+                                cursor: 'grab',
+                              }}
                             >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton
-                              edge="end"
-                              aria-label="delete"
-                              onClick={() => onRemoveSegment(index)}
-                              size="small"
+                              <DragHandleIcon fontSize="small" color="action" />
+                            </div>
+                            <ListItemText
+                              primary={getSegmentDescription(segment, index)}
+                            />
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                right: 8,
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                display: 'flex',
+                                gap: 1,
+                              }}
                             >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Box>
-                        </ListItem>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </List>
-              )}
-            </Droppable>
-          </DragDropContext>
+                              <IconButton
+                                edge="end"
+                                aria-label="edit"
+                                onClick={() => onEditSegment(index)}
+                                size="small"
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                              <IconButton
+                                edge="end"
+                                aria-label="delete"
+                                onClick={() => onRemoveSegment(index)}
+                                size="small"
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Box>
+                          </ListItem>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </List>
+                )}
+              </Droppable>
+            </DragDropContext>
+          )}
         </Paper>
       )}
+      <NutritionGuidance segments={workout.segments} />
     </Box>
   );
 }; 

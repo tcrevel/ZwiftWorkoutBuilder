@@ -8,6 +8,14 @@ export default function ChangeLog() {
         Change Log
       </Typography>
 
+      <Typography variant="h6">Version 1.3.0 (2024-03-23)</Typography>
+      <ul>
+        <li>Added nutrition guidance with calorie and carb calculations</li>
+        <li>Added hydration recommendations</li>
+        <li>Added fueling strategy suggestions</li>
+        <li>Added pre-workout nutrition timing tips</li>
+      </ul>
+
       <Typography variant="h6">Version 1.2.0 (2024-03-22)</Typography>
       <ul>
         <li>Added duration presets for quick segment creation</li>
