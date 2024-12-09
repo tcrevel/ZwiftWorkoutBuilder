@@ -352,14 +352,16 @@ const WorkoutBuilder: React.FC<WorkoutBuilderProps> = ({
   };
 
   const handleClearSegments = () => {
-    if (window.confirm('Are you sure you want to clear all segments?')) {
+    if (window.confirm('Are you sure you want to clear all segments? This will also clear the workout name and description.')) {
       updateWorkout({
         ...history.present,
-        segments: []
+        segments: [],
+        name: '',
+        description: ''
       });
       setNotification({
         open: true,
-        message: 'All segments cleared',
+        message: 'Workout cleared',
         severity: 'success'
       });
     }
