@@ -1,23 +1,44 @@
 # Zwift Workout Builder
 
-A web-based tool for creating and managing Zwift workouts.
+A web-based tool for creating and managing Zwift workouts with advanced training metrics and nutrition guidance.
 
 ## Features
 
+### Core Features
 - Visual workout builder with real-time power graph preview
-- Support for all workout segment types:
-  - Steady state
-  - Intervals
-  - Warmup
-  - Cooldown
+- Support for all workout segment types (Steady, Intervals, Warmup, Cooldown)
 - Import and export Zwift-compatible .zwo files
 - Drag and drop segment reordering
 - Undo/Redo functionality with keyboard shortcuts (Ctrl+Z, Ctrl+Y)
 - Duration presets for quick workout creation
+
+### Advanced Metrics
+- Training Stress Score (TSS) calculation
+- Normalized Power (NP) estimation
+- Intensity Factor (IF) analysis
+- Work calculation in kilojoules (kJ)
+
+### Power Analysis
+- Time in zones breakdown
+- Zone distribution visualization
 - Power zone targeting
-- Workout library for saving and loading workouts
-- Automatic workout saving
+- Workout type classification
+
+### Training Guidance
+- Energy system focus detection
+- Recovery recommendations
+- Nutrition guidance with calorie and carb calculations
+- Hydration recommendations
+- Fueling strategy suggestions
+- Pre-workout nutrition timing tips
+
+### User Experience
+- Intuitive segment creation and editing
+- Precise duration control
 - Responsive design for all devices
+- Modern, clean interface
+- Automatic workout saving
+- Workout library for saving and loading workouts
 
 ## Getting Started
 
