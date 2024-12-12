@@ -40,6 +40,15 @@ A web-based tool for creating and managing Zwift workouts with advanced training
 - Automatic workout saving
 - Workout library for saving and loading workouts
 
+### Workout Analysis
+- Power zone distribution visualization
+- Training metrics (TSS, IF, Normalized Power)
+- Workout Difficulty Estimator
+  - Smart difficulty calculation based on multiple training factors
+  - Color-coded ratings from Easy to Extreme
+  - Hover tooltips with detailed difficulty descriptions
+  - Helps athletes gauge workout intensity and plan training appropriately
+
 ## Getting Started
 
 ### Prerequisites
@@ -127,3 +136,19 @@ If you encounter any issues or have questions, please [open an issue](https://gi
 ## Repository
 
 - GitHub: [https://github.com/tcrevel/ZwiftWorkoutBuilder](https://github.com/tcrevel/ZwiftWorkoutBuilder)
+
+## Technical Details
+
+### Workout Difficulty Calculation
+The workout difficulty is calculated using a weighted scoring system:
+- 40% - Intensity Factor (IF)
+- 20% - Workout Duration
+- 30% - High-intensity Zone Time
+- 10% - Training Stress Score (TSS)
+
+Difficulty levels:
+- Easy (0-39): Recovery or endurance focused workout
+- Moderate (40-59): Steady endurance with some intensity
+- Hard (60-79): Challenging workout with significant threshold work
+- Very Hard (80-89): High intensity with substantial anaerobic work
+- Extreme (90-100): Maximum effort workout with extensive high-intensity intervals
