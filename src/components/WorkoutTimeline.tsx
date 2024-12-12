@@ -47,6 +47,13 @@ interface PowerZone {
   color: string;
 }
 
+interface WorkoutDifficulty {
+  score: number;
+  label: 'Easy' | 'Moderate' | 'Hard' | 'Very Hard' | 'Extreme';
+  color: string;
+  description: string;
+}
+
 const POWER_ZONES: PowerZone[] = [
   { name: 'Z1 (Recovery)', min: 0, max: 55, color: '#CCCCCC' },
   { name: 'Z2 (Endurance)', min: 55, max: 75, color: '#59C3E2' },
@@ -54,6 +61,39 @@ const POWER_ZONES: PowerZone[] = [
   { name: 'Z4 (Threshold)', min: 90, max: 105, color: '#F4C01A' },
   { name: 'Z5 (VO2 Max)', min: 105, max: 120, color: '#F37021' },
   { name: 'Z6 (Anaerobic)', min: 120, max: 150, color: '#D22E1F' },
+];
+
+const DIFFICULTY_LEVELS: WorkoutDifficulty[] = [
+  { 
+    score: 0,
+    label: 'Easy',
+    color: '#4CAF50',
+    description: 'Recovery or endurance focused workout'
+  },
+  { 
+    score: 40,
+    label: 'Moderate',
+    color: '#2196F3',
+    description: 'Steady endurance with some intensity'
+  },
+  { 
+    score: 60,
+    label: 'Hard',
+    color: '#FFC107',
+    description: 'Challenging workout with significant time at threshold'
+  },
+  { 
+    score: 80,
+    label: 'Very Hard',
+    color: '#FF5722',
+    description: 'High intensity with substantial anaerobic work'
+  },
+  { 
+    score: 90,
+    label: 'Extreme',
+    color: '#F44336',
+    description: 'Maximum effort workout with extensive high-intensity intervals'
+  }
 ];
 
 const getPowerZoneColor = (power: number): string => {
@@ -431,6 +471,45 @@ export default function WorkoutTimeline({
     setSegmentsExpanded(!segmentsExpanded);
   };
 
+  const calculateDifficulty = (): WorkoutDifficulty => {
+    if (workout.segments.length === 0) {
+      return DIFFICULTY_LEVELS[0];
+    }
+
+    // Calculate various factors
+    const if_ = calculateIF();
+    const tss = calculateTSS();
+    const timeInZones = calculateTimeInZones();
+    const totalDuration = getTotalDuration();
+    
+    // Calculate percentage of time spent in high intensity zones (Z4+)
+    const highIntensityTime = timeInZones.slice(3).reduce((a, b) => a + b, 0);
+    const highIntensityPercentage = (highIntensityTime / totalDuration) * 100;
+    
+    // Calculate base score from multiple factors
+    let difficultyScore = 0;
+    
+    // Factor 1: Intensity Factor contribution (0-40 points)
+    difficultyScore += Math.min(if_ * 40, 40);
+    
+    // Factor 2: Duration contribution (0-20 points)
+    const durationHours = totalDuration / 3600;
+    difficultyScore += Math.min(durationHours * 10, 20);
+    
+    // Factor 3: High intensity percentage contribution (0-30 points)
+    difficultyScore += Math.min(highIntensityPercentage * 0.75, 30);
+    
+    // Factor 4: TSS contribution (0-10 points)
+    difficultyScore += Math.min(tss / 40, 10);
+    
+    // Find the appropriate difficulty level
+    return DIFFICULTY_LEVELS.reduce((prev, curr) => {
+      return difficultyScore >= curr.score ? curr : prev;
+    });
+  };
+
+  const difficulty = calculateDifficulty();
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <Paper sx={{ p: 2 }}>
@@ -483,6 +562,31 @@ export default function WorkoutTimeline({
                   <Box component="span" sx={{ fontWeight: 'bold', ml: 1 }}>IF:</Box> {calculateIF()} • 
                   <Box component="span" sx={{ fontWeight: 'bold', ml: 1 }}>Work:</Box> {calculateWork()}kJ
                 </Typography>
+                <Tooltip title={difficulty.description} arrow>
+                  <Typography 
+                    variant="subtitle2" 
+                    color="text.secondary" 
+                    sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: 0.5 
+                    }}
+                  >
+                    <FitnessCenterIcon fontSize="small" />
+                    <Box component="span" sx={{ fontWeight: 'bold' }}>
+                      Difficulty:
+                    </Box>
+                    <Box 
+                      component="span" 
+                      sx={{ 
+                        color: difficulty.color,
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {difficulty.label}
+                    </Box>
+                  </Typography>
+                </Tooltip>
               </Box>
 
               {/* Second Row - Workout Characteristics */}
