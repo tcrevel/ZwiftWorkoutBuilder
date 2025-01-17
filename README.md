@@ -2,6 +2,8 @@
 
 A web-based tool for creating and managing Zwift workouts with advanced training metrics and nutrition guidance.
 
+It's available on https://zwift.aqpm.app/
+
 ## Features
 
 ### Core Features
